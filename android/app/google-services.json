@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "231154984703",
+    "project_id": "haidenjem-db-1c9fd",
+    "storage_bucket": "haidenjem-db-1c9fd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:231154984703:android:c93a71f4d81c73eacececa",
+        "android_client_info": {
+          "package_name": "com.example.haidenjem"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlw3Rp9D4h6qx39CE0ogu9ExHkVj-76Uw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
