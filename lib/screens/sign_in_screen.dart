@@ -9,7 +9,7 @@ final googleSignIn = GoogleSignIn(
     'email',
   ],
   clientId:
-  '231154984703-6jm1g98dk79o0a6a3s5uoauapr19q63e.apps.googleusercontent.com',
+      '231154984703-6jm1g98dk79o0a6a3s5uoauapr19q63e.apps.googleusercontent.com',
 );
 
 class SignInScreen extends StatefulWidget {
@@ -29,7 +29,7 @@ class SignInScreenState extends State<SignInScreen> {
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
       if (googleUser != null) {
         final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
+            await googleUser.authentication;
         final credential = GoogleAuthProvider.credential(
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
@@ -54,6 +54,7 @@ class SignInScreenState extends State<SignInScreen> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 350,
+        automaticallyImplyLeading: false,
         title: Image.asset(
           'assets/images/logo.png',
           height: 100,
@@ -137,7 +138,7 @@ class SignInScreenState extends State<SignInScreen> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                               content:
-                              Text('Wrong password. Please try again.')),
+                                  Text('Wrong password. Please try again.')),
                         );
                       } else {
                         // Jika terjadi kesalahan lain, tampilkan pesan kesalahan umum
@@ -202,7 +203,7 @@ class SignInScreenState extends State<SignInScreen> {
                       const SizedBox(width: 16.0),
                       const Text(
                         'Sign In with Google',
-                        style: TextStyle(fontSize: 15),
+                        style: TextStyle(fontSize: 15, color: Colors.white),
                       ),
                     ],
                   ),

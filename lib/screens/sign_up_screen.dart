@@ -16,6 +16,7 @@ class SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -54,7 +55,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                     borderSide: BorderSide(
                         width: 2,
                         color:
-                        Colors.black), // change the border width and color
+                            Colors.black), // change the border width and color
                   ),
                 ),
               ),
@@ -69,7 +70,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                     borderSide: BorderSide(
                         width: 2,
                         color:
-                        Colors.black), // change the border width and color
+                            Colors.black), // change the border width and color
                   ),
                 ),
                 obscureText: true,
@@ -79,7 +80,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 150, vertical: 10),
+                      const EdgeInsets.symmetric(horizontal: 150, vertical: 10),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -108,7 +109,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                             content:
-                            Text('The password provided is too weak.')),
+                                Text('The password provided is too weak.')),
                       );
                     } else if (e.code == 'email-already-in-use') {
                       ScaffoldMessenger.of(context).showSnackBar(
