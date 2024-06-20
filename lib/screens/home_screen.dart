@@ -130,6 +130,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         description: documentSnapshot['deskripsi'],
                         timestamp: documentSnapshot['timestamp'],
                         userEmail: documentSnapshot['user_email'],
+                        latitude: documentSnapshot['latitude'],
+                        longitude: documentSnapshot['longitude'],
                       ),
                     ),
                   );
