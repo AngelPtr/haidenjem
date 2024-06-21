@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:haidenjem/screens/home_screen.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ class _PostScreenState extends State<PostScreen> {
   final _controllerTitle = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
   XFile? _image;
   String _locationMessage = "";
   Position? _currentPosition;
@@ -127,6 +129,8 @@ class _PostScreenState extends State<PostScreen> {
                         .putFile(File(_image!.path));
                     final downloadUrl = await uploadTask.ref.getDownloadURL();
 
+                    String? Token = await _firebaseMessaging.getToken();
+
                     // Add Firebase Cloud Firestore functionality here
                     final CollectionReference posts =
                         FirebaseFirestore.instance.collection('Post');
@@ -138,6 +142,7 @@ class _PostScreenState extends State<PostScreen> {
                       'user_email': _auth.currentUser?.email,
                       'latitude': _currentPosition!.latitude,
                       'longitude': _currentPosition!.longitude,
+                      'user_token': Token,
                     });
 
                     ScaffoldMessenger.of(context).showSnackBar(

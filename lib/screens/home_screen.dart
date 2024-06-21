@@ -3,6 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:haidenjem/main.dart';
 import 'package:haidenjem/screens/detail_screen.dart';
 import 'package:haidenjem/screens/favorite_screen.dart';
+import 'package:haidenjem/screens/notif_screen.dart';
 import 'package:haidenjem/screens/post_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -32,12 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
     ProfileScreen(),
   ];
 
-  Future<void> signOut(BuildContext context) async {
-    await FirebaseAuth.instance.signOut();
-    Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => SignInScreen()));
-  }
-
   @override
   void initState() {
     super.initState();
@@ -52,14 +47,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('HaidenJem'),
+        automaticallyImplyLeading: false,
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: [
-          IconButton(
-            onPressed: () {
-              signOut(context);
-            },
-            icon: const Icon(Icons.logout),
-          ),
           IconButton(
             icon: Stack(
               children: [
@@ -90,7 +80,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             onPressed: () {
-              // Handle the notification button press
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => NotificationScreen()),
+              );
             },
           )
         ],
