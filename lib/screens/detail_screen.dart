@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:haidenjem/screens/edit_post.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -62,7 +63,23 @@ class _DetailScreenState extends State<DetailScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.edit),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditPostScreen(
+                    documentId: widget.documentId,
+                    imageUrl: widget.imageUrl,
+                    title: widget.title,
+                    description: widget.description,
+                    timestamp: widget.timestamp,
+                    userEmail: widget.userEmail,
+                    latitude: widget.latitude,
+                    longitude: widget.longitude,
+                  ),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -107,7 +124,9 @@ class _DetailScreenState extends State<DetailScreen> {
                       Row(
                         children: [
                           IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              _likeData();
+                            },
                             icon: Icon(
                               isFavorite
                                   ? Icons.favorite
@@ -217,6 +236,56 @@ class _DetailScreenState extends State<DetailScreen> {
       }
     } catch (e) {
       print('Error: $e');
+    }
+  }
+
+  void _likeData() async {
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+    final String userId =
+        'current_user_id'; // Replace with the current user's ID
+
+    final DocumentSnapshot favoriteDoc = await _firestore
+        .collection('favorites')
+        .doc(userId)
+        .collection('posts')
+        .doc(widget.documentId)
+        .get();
+
+    if (favoriteDoc.exists) {
+      await _firestore
+          .collection('favorites')
+          .doc(userId)
+          .collection('posts')
+          .doc(widget.documentId)
+          .delete();
+
+      setState(() {
+        isFavorite = false;
+      });
+
+      print('Post removed from favorites');
+    } else {
+      await _firestore
+          .collection('favorites')
+          .doc(userId)
+          .collection('posts')
+          .doc(widget.documentId)
+          .set({
+        'postId': widget.documentId,
+        'title': widget.title,
+        'imageUrl': widget.imageUrl,
+        'description': widget.description,
+        'timestamp': widget.timestamp,
+        'userEmail': widget.userEmail,
+        'latitude': widget.latitude,
+        'longitude': widget.longitude,
+      });
+
+      setState(() {
+        isFavorite = true;
+      });
+
+      print('Post added to favorites');
     }
   }
 }
