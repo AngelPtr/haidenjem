@@ -135,7 +135,9 @@ class _DetailScreenState extends State<DetailScreen> {
                             ),
                           ),
                           IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              _commentData();
+                            },
                             icon: Icon(Icons.comment),
                           ),
                         ],
@@ -206,7 +208,9 @@ class _DetailScreenState extends State<DetailScreen> {
                                               .instance.currentUser?.email)
                                       ? IconButton(
                                           icon: Icon(Icons.delete),
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            _deleteComment(comment.id);
+                                          },
                                         )
                                       : null,
                                 );
@@ -286,6 +290,146 @@ class _DetailScreenState extends State<DetailScreen> {
       });
 
       print('Post added to favorites');
+    }
+  }
+
+  void _commentData() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Comment'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _commentController,
+                decoration: InputDecoration(
+                  labelText: 'Enter your comment',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10), // border radius
+                    borderSide: BorderSide(
+                        width: 2, color: Colors.blue), // border style
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                        width: 2,
+                        color: Colors.blueAccent), // focused border style
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(width: 2, color: Colors.blue),
+                  ),
+                  filled: true, // fill the background with a color
+                  fillColor: Colors.white,
+                ),
+              ),
+              SizedBox(height: 16),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.blue, // text color
+                  elevation: 5, // elevation
+                  padding: EdgeInsets.all(16), // padding
+                  textStyle: TextStyle(fontSize: 18), // text style
+                ),
+                onPressed: () {
+                  _saveComment(_commentController.text);
+                },
+                child: Text('Post Comment'),
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _saveComment(String commentText) async {
+    if (commentText.isNotEmpty) {
+      final currentUserEmail = FirebaseAuth.instance.currentUser?.email;
+      if (currentUserEmail != null) {
+        final docRef = await FirebaseFirestore.instance
+            .collection('posts')
+            .doc(widget.documentId)
+            .collection('comments')
+            .add({
+          'userEmail': currentUserEmail,
+          'comment': commentText,
+          'timestamp': Timestamp.now(),
+        });
+
+        await _saveNotification(
+          docRef.id,
+          widget.documentId,
+          widget.title,
+          commentText,
+          currentUserEmail,
+        );
+
+        _commentController.clear(); // Clear text field after posting comment
+        setState(() {}); // Trigger rebuild
+
+        print('Comment saved');
+      } else {
+        print('User not authenticated');
+      }
+      Navigator.pop(context);
+    } else {
+      print('Comment text is empty');
+    }
+  }
+
+  Future<void> _saveNotification(String commentId, String postId,
+      String postTitle, String commentText, String commenterEmail) async {
+    try {
+      await FirebaseFirestore.instance.collection('notifications').add({
+        'postId': postId,
+        'postTitle': postTitle,
+        'comment': commentText,
+        'commenterEmail': commenterEmail,
+        'commentId': commentId,
+        'timestamp': Timestamp.now(),
+      });
+      print('Notification saved');
+    } catch (e) {
+      print('Error saving notification: $e');
+    }
+  }
+
+  void _deleteComment(String commentId) async {
+    final currentUserEmail = FirebaseAuth.instance.currentUser?.email;
+
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(widget.documentId)
+          .collection('comments')
+          .doc(commentId)
+          .get();
+
+      if (doc.exists) {
+        final commentEmail = doc['userEmail'];
+
+        if (currentUserEmail == commentEmail) {
+          await FirebaseFirestore.instance
+              .collection('posts')
+              .doc(widget.documentId)
+              .collection('comments')
+              .doc(commentId)
+              .delete();
+
+          print('Comment deleted');
+          setState(() {}); // Trigger rebuild
+        } else {
+          print('Current user cannot delete this comment');
+        }
+      } else {
+        print('Comment not found');
+      }
+    } catch (e) {
+      print('Error deleting comment: $e');
     }
   }
 }
