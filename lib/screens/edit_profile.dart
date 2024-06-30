@@ -1,7 +1,10 @@
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:haidenjem/main.dart';
+import 'package:haidenjem/screens/profile_screen.dart';
 import 'package:image_picker/image_picker.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -16,6 +19,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final ImagePicker _picker = ImagePicker();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
@@ -27,17 +31,32 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Profile'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text(
+          'Edit Profile',
+          style: TextStyle(
+              color: Colors.lightGreenAccent), // change the title color to red
+        ),
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.black // Dark mode
+            : Colors.green[900], // Light mode
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Theme(
+            data: Theme.of(context).copyWith(
+                iconTheme: const IconThemeData(
+                    color: Colors
+                        .lightGreenAccent)), // change the icon color to red
+            child: Icon(Icons.arrow_back),
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         actions: [
           TextButton(
+            style: TextButton.styleFrom(
+                foregroundColor:
+                    Colors.lightGreenAccent), // change the text color to red
             onPressed: _saveProfile,
             child: const Text('Save'),
           ),
@@ -51,43 +70,56 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             child: Column(
               children: [
                 Center(
-                  child: Stack(
-                    children: [
-                      _image != null
-                          ? CircleAvatar(
-                              radius: 60,
-                              backgroundImage: Image.file(_image!).image,
-                            )
-                          : CircleAvatar(
-                              radius: 60,
-                              backgroundColor: Colors.grey[300],
-                              child: const Icon(
-                                Icons.person,
-                                size: 60,
-                              ),
+                    child: Stack(
+                  children: [
+                    _image != null
+                        ? CircleAvatar(
+                            radius: 60,
+                            backgroundImage: Image.file(_image!).image,
+                          )
+                        : CircleAvatar(
+                            radius: 60,
+                            backgroundColor: Theme.of(context).brightness ==
+                                    Brightness.dark
+                                ? Colors.white // Dark mode background color
+                                : Colors
+                                    .grey[600], // Light mode background color
+                            child: Icon(
+                              Icons.person,
+                              size: 60,
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.black // Dark mode icon color
+                                  : Colors.white, // Light mode icon color
                             ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: GestureDetector(
-                          onTap: _showImageSourceDialog,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.grey,
-                                width: 2,
-                              ),
-                            ),
-                            padding: const EdgeInsets.all(4),
-                            child: const Icon(Icons.camera_alt, size: 20),
+                          ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: GestureDetector(
+                        onTap: _showImageSourceDialog,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).brightness ==
+                                    Brightness.dark
+                                ? Colors.grey[300] // Dark mode container color
+                                : Colors.black, // Light mode container color
+                            shape: BoxShape.circle,
+                          ),
+                          padding: const EdgeInsets.all(4),
+                          child: Icon(
+                            Icons.camera_alt,
+                            size: 20,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.black // Dark mode icon color
+                                    : Colors.white, // Light mode icon color
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
+                    ),
+                  ],
+                )),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _nameController,
@@ -99,7 +131,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     filled: true, // fill the background with a color
                     fillColor: Colors.white, // background color
+                    labelStyle: TextStyle(
+                      color: Colors.blue, // change the hint text color to grey
+                    ),
                   ),
+                  style: TextStyle(color: Colors.black),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your name';
@@ -118,7 +154,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     filled: true, // fill the background with a color
                     fillColor: Colors.white, // background color
+                    labelStyle: TextStyle(
+                      color: Colors.blue, // change the hint text color to grey
+                    ),
                   ),
+                  style: TextStyle(color: Colors.black),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your username';
@@ -138,7 +178,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     filled: true, // fill the background with a color
                     fillColor: Colors.white, // background color
+                    labelStyle: TextStyle(
+                      color: Colors.blue, // change the hint text color to grey
+                    ),
                   ),
+                  style: TextStyle(color: Colors.black),
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -151,7 +195,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     filled: true, // fill the background with a color
                     fillColor: Colors.white, // background color
+                    labelStyle: TextStyle(
+                      color: Colors.blue, // change the hint text color to grey
+                    ),
                   ),
+                  style: TextStyle(color: Colors.black),
                 ),
               ],
             ),
@@ -204,25 +252,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   void _saveProfile() async {
     if (_formKey.currentState!.validate()) {
+      final userEmail = _auth.currentUser!.email;
       if (_image != null) {
         final ref =
-            _storage.ref().child('profilePictures').child('username.jpg');
+            _storage.ref().child('profilePictures').child('$userEmail.jpg');
         await ref.putFile(_image!);
         final url = await ref.getDownloadURL();
 
         // Check if the "profile" collection exists
         final collectionRef = _firestore.collection('profile');
-        final snapshot = await collectionRef.get();
-        if (snapshot.docs.isEmpty) {
-          // If the collection doesn't exist, create it
-          await collectionRef.doc('username').set({
+        final snapshot = await collectionRef.doc(userEmail).get();
+        if (!snapshot.exists) {
+          // If the document doesn't exist, create it
+          await collectionRef.doc(userEmail).set({
             'profilePicture': url,
             'name': _nameController.text,
             'username': _usernameController.text,
+            'email': userEmail,
           });
         } else {
-          // If the collection exists, update the document
-          await collectionRef.doc('username').update({
+          // If the document exists, update it
+          await collectionRef.doc(userEmail).update({
             'profilePicture': url,
             'name': _nameController.text,
             'username': _usernameController.text,
@@ -230,22 +280,31 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         }
       } else {
         final collectionRef = _firestore.collection('profile');
-        final snapshot = await collectionRef.get();
-        if (snapshot.docs.isEmpty) {
-          // If the collection doesn't exist, create it
-          await collectionRef.doc('username').set({
+        final snapshot = await collectionRef.doc(userEmail).get();
+        if (!snapshot.exists) {
+          // If the document doesn't exist, create it
+          await collectionRef.doc(userEmail).set({
             'name': _nameController.text,
             'username': _usernameController.text,
+            'email': userEmail,
           });
         } else {
-          // If the collection exists, update the document
-          await collectionRef.doc('username').update({
+          // If the document exists, update it
+          await collectionRef.doc(userEmail).update({
             'name': _nameController.text,
             'username': _usernameController.text,
           });
         }
       }
-      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Profile Updated'),
+        ),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => BottomNavBar()),
+      );
     }
   }
 }

@@ -23,9 +23,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: const Text(
+          'Settings',
+          style: TextStyle(
+              color: Colors.lightGreenAccent), // change the title color to red
+        ),
         //automaticallyImplyLeading: false,
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.black // Dark mode
+            : Colors.green[900], // Light mode
+        leading: IconButton(
+          icon: Theme(
+            data: Theme.of(context).copyWith(
+                iconTheme: const IconThemeData(
+                    color: Colors
+                        .lightGreenAccent)), // change the icon color to red
+            child: Icon(Icons.arrow_back),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

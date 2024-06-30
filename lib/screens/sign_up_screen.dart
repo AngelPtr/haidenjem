@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:haidenjem/main.dart';
 import 'package:haidenjem/screens/home_screen.dart';
 import 'package:haidenjem/screens/sign_in_screen.dart';
 
@@ -101,8 +102,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                       password: password,
                     );
                     Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                          builder: (context) => const HomeScreen()),
+                      MaterialPageRoute(builder: (context) => BottomNavBar()),
                     );
                   } on FirebaseAuthException catch (e) {
                     if (e.code == 'weak-password') {

@@ -1,6 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:haidenjem/screens/detail_screen.dart';
 
 class NotificationData {
   final String postId;
@@ -21,8 +21,26 @@ class NotificationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notifications'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text(
+          'Notifications',
+          style: TextStyle(
+              color: Colors.lightGreenAccent), // change the title color to red
+        ),
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.black // Dark mode
+            : Colors.green[900], // Light mode
+        leading: IconButton(
+          icon: Theme(
+            data: Theme.of(context).copyWith(
+                iconTheme: const IconThemeData(
+                    color: Colors
+                        .lightGreenAccent)), // change the icon color to red
+            child: Icon(Icons.arrow_back),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: NotificationList(),
     );
@@ -85,92 +103,131 @@ class NotificationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dismissible(
-      key: Key(notificationDocId), // Use notification's document ID as key
-      direction: DismissDirection.endToStart, // Swipe from right to left
-      background: Container(
-        color: Colors.red,
-        alignment: Alignment.centerRight,
-        padding: EdgeInsets.symmetric(horizontal: 16.0),
-        child: Icon(
-          Icons.delete,
-          color: Colors.white,
-        ),
-      ),
-      onDismissed: (direction) {
-        // Delete the notification document from Firestore
-        FirebaseFirestore.instance
-            .collection('notifications')
-            .doc(notificationDocId)
-            .delete()
-            .then((value) {
-          print('Notification deleted successfully');
-        }).catchError((error) {
-          print('Failed to delete notification: $error');
-        });
+    // Fetch the current user's email
+    final currentUserEmail = FirebaseAuth.instance.currentUser!.email!;
+
+    // Check if the comment is from the current user
+    bool isCurrentUserComment = notification.commenterEmail == currentUserEmail;
+
+    return FutureBuilder(
+      future: _getProfilePicture(notification.commenterEmail),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          String profilePictureUrl = snapshot.data as String;
+          return Dismissible(
+            key: Key(notificationDocId),
+            direction: DismissDirection.endToStart,
+            background: Container(
+              color: Colors.red,
+              alignment: Alignment.centerRight,
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: Icon(
+                Icons.delete,
+                color: Colors.white,
+              ),
+            ),
+            onDismissed: (direction) {
+              // Delete the notification document from Firestore
+              FirebaseFirestore.instance
+                  .collection('notifications')
+                  .doc(notificationDocId)
+                  .delete()
+                  .then((value) {
+                print('Notification deleted successfully');
+              }).catchError((error) {
+                print('Failed to delete notification: $error');
+              });
+            },
+            child: isCurrentUserComment
+                ? SizedBox
+                    .shrink() // Hide the tile if it's the current user's comment
+                : ListTile(
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    leading: CircleAvatar(
+                      radius: 24,
+                      backgroundImage: NetworkImage(profilePictureUrl),
+                    ),
+                    title: RichText(
+                      text: TextSpan(
+                        style: DefaultTextStyle.of(context).style,
+                        children: <TextSpan>[
+                          TextSpan(
+                            text: '${notification.commenterEmail} ',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.grey[300] // Dark mode text color
+                                  : Colors.black, // Light mode text color
+                            ),
+                          ),
+                          TextSpan(
+                            text: 'Commented on "${notification.postTitle}"',
+                            style: TextStyle(
+                              color: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.grey[300] // Dark mode text color
+                                  : Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    subtitle: Text(
+                      notification.comment,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    trailing: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisSize: MainAxisSize
+                          .min, // Ensure the delete button is aligned properly
+                      children: [
+                        Expanded(
+                          child: SizedBox(
+                            width: 40, // Set the width of the SizedBox
+                            height: 40, // Set the height of the SizedBox
+                            child: IconButton(
+                              icon: Icon(Icons.delete,
+                                  size: 24), // Change the size of the icon here
+                              onPressed: () {
+                                // Delete the notification document from Firestore
+                                FirebaseFirestore.instance
+                                    .collection('notifications')
+                                    .doc(notificationDocId)
+                                    .delete()
+                                    .then((value) {
+                                  print('Notification deleted successfully');
+                                }).catchError((error) {
+                                  print(
+                                      'Failed to delete notification: $error');
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+          );
+        } else {
+          return SizedBox
+              .shrink(); // Hide the tile if profile picture data is not available yet
+        }
       },
-      child: ListTile(
-        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: CircleAvatar(
-          radius: 24,
-          backgroundImage: NetworkImage('https://via.placeholder.com/150'),
-        ),
-        title: RichText(
-          text: TextSpan(
-            style: DefaultTextStyle.of(context).style,
-            children: <TextSpan>[
-              TextSpan(
-                text: '${notification.commenterEmail} ',
-                style:
-                    TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-              ),
-              TextSpan(
-                text: 'commented on "${notification.postTitle}"',
-                style: TextStyle(color: Colors.black),
-              ),
-            ],
-          ),
-        ),
-        subtitle: Text(
-          notification.comment,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
-        trailing: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisSize:
-              MainAxisSize.min, // Ensure the delete button is aligned properly
-          children: [
-            Text(
-              '', // Replace with time ago calculation
-              style: TextStyle(color: Colors.grey),
-            ),
-            SizedBox(height: 4),
-            Expanded(
-              child: SizedBox(
-                width: 40, // Set the width of the SizedBox
-                height: 40, // Set the height of the SizedBox
-                child: IconButton(
-                  icon: Icon(Icons.delete,
-                      size: 24), // Change the size of the icon here
-                  onPressed: () {
-                    // Delete the notification document from Firestore
-                    FirebaseFirestore.instance
-                        .collection('notifications')
-                        .doc(notificationDocId)
-                        .delete()
-                        .then((value) {
-                      print('Notification deleted successfully');
-                    }).catchError((error) {
-                      print('Failed to delete notification: $error');
-                    });
-                  },
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
+  }
+
+  Future<String> _getProfilePicture(String userEmail) async {
+    final collectionRef = FirebaseFirestore.instance.collection('profile');
+    final snapshot = await collectionRef.doc(userEmail).get();
+
+    if (snapshot.exists) {
+      return snapshot.get('profilePicture') ?? '';
+    } else {
+      return ''; // Return a default profile picture URL or an empty string
+    }
   }
 }

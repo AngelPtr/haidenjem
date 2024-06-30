@@ -1,16 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:haidenjem/main.dart';
 import 'package:haidenjem/screens/detail_screen.dart';
-import 'package:haidenjem/screens/favorite_screen.dart';
 import 'package:haidenjem/screens/notif_screen.dart';
-import 'package:haidenjem/screens/post_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:haidenjem/screens/profile_screen.dart';
-import 'package:haidenjem/screens/search_screen.dart';
-import 'package:haidenjem/screens/sign_in_screen.dart';
-import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -23,15 +16,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   late Stream<QuerySnapshot> _postsStream = Stream.empty();
-
-  int _selectedIndex = 0;
-  final List<Widget> _screens = [
-    HomeScreen(),
-    SearchScreen(),
-    PostScreen(),
-    FavoriteScreen(),
-    ProfileScreen(),
-  ];
 
   @override
   void initState() {
@@ -46,14 +30,24 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('HaidenJem'),
+        title: const Text(
+          'HaidenJem',
+          style: TextStyle(
+              color: Colors.lightGreenAccent), // change the title color to red
+        ),
         automaticallyImplyLeading: false,
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.black // Dark mode
+            : Colors.green[900], // Light mode
         actions: [
           IconButton(
             icon: Stack(
               children: [
-                Icon(Icons.notifications),
+                const Icon(
+                  Icons.notifications,
+                  color:
+                      Colors.lightGreenAccent, // Change the icon color to blue
+                ),
                 Positioned(
                   top: 0,
                   right: 0,
@@ -85,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 MaterialPageRoute(builder: (context) => NotificationScreen()),
               );
             },
-          )
+          ),
         ],
       ),
       body: StreamBuilder<QuerySnapshot>(
@@ -142,76 +136,6 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           );
         },
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.black,
-        currentIndex: _selectedIndex,
-        onTap: (int index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => _screens[index]),
-          );
-        },
-        items: [
-          BottomNavigationBarItem(
-            icon: Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black),
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-              ),
-              child: Icon(Icons.home),
-            ),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black),
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-              ),
-              child: Icon(Icons.search),
-            ),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Container(
-              height: 50,
-              width: 50,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black),
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-              ),
-              child: Icon(Icons.add),
-            ),
-            label: 'Post',
-          ),
-          BottomNavigationBarItem(
-            icon: Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black),
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-              ),
-              child: Icon(Icons.favorite),
-            ),
-            label: 'Favorite',
-          ),
-          BottomNavigationBarItem(
-            icon: Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black),
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-              ),
-              child: Icon(Icons.person),
-            ),
-            label: 'Profile',
-          ),
-        ],
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:haidenjem/main.dart';
 import 'package:haidenjem/screens/home_screen.dart';
 import 'package:haidenjem/screens/sign_up_screen.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -122,8 +123,7 @@ class SignInScreenState extends State<SignInScreen> {
                       );
                       // Jika berhasil sign in, navigasi ke halaman beranda
                       Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                            builder: (context) => const HomeScreen()),
+                        MaterialPageRoute(builder: (context) => BottomNavBar()),
                       );
                     } on FirebaseAuthException catch (error) {
                       print('Error code: ${error.code}');

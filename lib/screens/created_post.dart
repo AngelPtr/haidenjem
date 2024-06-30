@@ -17,8 +17,26 @@ class _CreatedPostScreenState extends State<CreatedPostScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Created Posts'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text(
+          'Created Posts',
+          style: TextStyle(
+              color: Colors.lightGreenAccent), // change the title color to red
+        ),
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.black // Dark mode
+            : Colors.green[900], // Light mode
+        leading: IconButton(
+          icon: Theme(
+            data: Theme.of(context).copyWith(
+                iconTheme: const IconThemeData(
+                    color: Colors
+                        .lightGreenAccent)), // change the icon color to red
+            child: Icon(Icons.arrow_back),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _firestore

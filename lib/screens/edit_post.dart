@@ -40,8 +40,26 @@ class _EditPostScreenState extends State<EditPostScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Post'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text(
+          'Edit Post',
+          style: TextStyle(
+              color: Colors.lightGreenAccent), // change the title color to red
+        ),
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.black // Dark mode
+            : Colors.green[900], // Light mode
+        leading: IconButton(
+          icon: Theme(
+            data: Theme.of(context).copyWith(
+                iconTheme: const IconThemeData(
+                    color: Colors
+                        .lightGreenAccent)), // change the icon color to red
+            child: Icon(Icons.arrow_back),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: SingleChildScrollView(
         child: Form(
@@ -56,6 +74,9 @@ class _EditPostScreenState extends State<EditPostScreen> {
                   initialValue: widget.title,
                   decoration: InputDecoration(
                     labelText: 'Title',
+                    labelStyle: const TextStyle(
+                      color: Colors.blue, // change the hint text color to grey
+                    ),
                     border: OutlineInputBorder(
                       borderSide:
                           BorderSide(width: 9, style: BorderStyle.solid),
@@ -77,6 +98,9 @@ class _EditPostScreenState extends State<EditPostScreen> {
                   initialValue: widget.description,
                   decoration: InputDecoration(
                     labelText: 'Description',
+                    labelStyle: const TextStyle(
+                      color: Colors.blue, // change the hint text color to grey
+                    ),
                     border: OutlineInputBorder(
                       borderSide:
                           BorderSide(width: 9, style: BorderStyle.solid),
@@ -116,6 +140,11 @@ class _EditPostScreenState extends State<EditPostScreen> {
                         });
 
                         Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Post Succesfully Updated'),
+                          ),
+                        );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(

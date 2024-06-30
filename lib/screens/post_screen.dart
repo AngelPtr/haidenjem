@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:haidenjem/main.dart';
 import 'package:haidenjem/screens/home_screen.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -38,18 +39,15 @@ class _PostScreenState extends State<PostScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Upload'),
+        title: const Text(
+          'Upload',
+          style: TextStyle(
+              color: Colors.lightGreenAccent), // change the title color to red
+        ),
         automaticallyImplyLeading: false,
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => const HomeScreen()));
-            },
-            icon: const Icon(Icons.arrow_back),
-          ),
-        ],
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.black // Dark mode
+            : Colors.green[900], // Light mode
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -77,6 +75,9 @@ class _PostScreenState extends State<PostScreen> {
                   filled: true, // fill the background with a color
                   fillColor: Colors.white,
                   hintText: 'Title',
+                  hintStyle: const TextStyle(
+                    color: Colors.blue, // change the hint text color to grey
+                  ),
                 ),
               ),
               SizedBox(height: 16),
@@ -90,6 +91,9 @@ class _PostScreenState extends State<PostScreen> {
                   filled: true, // fill the background with a color
                   fillColor: Colors.white,
                   hintText: 'Description',
+                  hintStyle: const TextStyle(
+                    color: Colors.blue, // change the hint text color to grey
+                  ),
                 ),
               ),
               SizedBox(height: 16),

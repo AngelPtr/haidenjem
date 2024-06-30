@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:haidenjem/main.dart';
 import 'package:haidenjem/screens/detail_screen.dart';
 import 'package:haidenjem/screens/home_screen.dart';
 
@@ -18,17 +19,15 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Favorites'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => HomeScreen()),
-            ); // Return to previous screen (home screen)
-          },
+        automaticallyImplyLeading: false,
+        title: const Text(
+          'Favorite',
+          style: TextStyle(
+              color: Colors.lightGreenAccent), // change the title color to red
         ),
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.black // Dark mode
+            : Colors.green[900], // Light mode
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _firestore

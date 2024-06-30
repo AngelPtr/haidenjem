@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:haidenjem/main.dart';
 import 'package:haidenjem/screens/created_post.dart';
 import 'package:haidenjem/screens/edit_profile.dart';
 import 'package:haidenjem/screens/home_screen.dart';
@@ -15,6 +16,8 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   String _userEmail = '';
+  String _username = '';
+  String _profilePicture = '';
 
   @override
   void initState() {
@@ -36,28 +39,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => HomeScreen()),
-            ); // Return to previous screen (home screen)
-          },
+
+        title: const Text(
+          'Profile',
+          style: TextStyle(
+              color: Colors.lightGreenAccent), // change the title color to red
         ),
-        title: const Text('Profile'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.black // Dark mode
+            : Colors.green[900], // Light mode
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: StreamBuilder<DocumentSnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('profile')
-              .doc('username')
-              .snapshots(),
+        child: FutureBuilder(
+          future: _getUserProfile(),
           builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              DocumentSnapshot document = snapshot.data!;
+            if (snapshot.connectionState == ConnectionState.done) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -67,11 +64,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       CircleAvatar(
                         radius: 50,
-                        backgroundImage: document['profilePicture'] != null
-                            ? NetworkImage(document['profilePicture'])
+                        backgroundImage: _profilePicture != ''
+                            ? NetworkImage(_profilePicture)
                             : null,
                         backgroundColor: Colors.grey[300],
-                        child: document['profilePicture'] == null
+                        child: _profilePicture == ''
                             ? const Icon(
                                 Icons.person,
                                 size: 40,
@@ -82,7 +79,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    document['username'],
+                    _username,
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -146,6 +143,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _getUserProfile() async {
+    final user = await FirebaseAuth.instance.currentUser!;
+    final userEmail = user.email;
+
+    final collectionRef = FirebaseFirestore.instance.collection('profile');
+    final snapshot = await collectionRef.doc(userEmail).get();
+
+    if (snapshot.exists) {
+      _username = snapshot.get('username') ?? '';
+      _profilePicture = snapshot.get('profilePicture') ?? '';
+    }
   }
 
   Widget _buildGridItem({

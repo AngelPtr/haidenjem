@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:haidenjem/screens/edit_post.dart';
+import 'package:haidenjem/screens/notif_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -51,36 +52,68 @@ class _DetailScreenState extends State<DetailScreen> {
     double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Post'),
+        title: const Text(
+          'Post',
+          style: TextStyle(
+              color: Colors.lightGreenAccent), // change the title color to red
+        ),
         automaticallyImplyLeading: false,
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.black // Dark mode
+            : Colors.green[900], // Light mode
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Theme(
+            data: Theme.of(context).copyWith(
+                iconTheme: const IconThemeData(
+                    color: Colors
+                        .lightGreenAccent)), // change the icon color to red
+            child: Icon(Icons.arrow_back),
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.edit),
+            icon: Stack(
+              children: [
+                const Icon(
+                  Icons.notifications,
+                  color:
+                      Colors.lightGreenAccent, // Change the icon color to blue
+                ),
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: Container(
+                    padding: EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    constraints: BoxConstraints(
+                      minWidth: 12,
+                      minHeight: 12,
+                    ),
+                    child: Text(
+                      '',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ],
+            ),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => EditPostScreen(
-                    documentId: widget.documentId,
-                    imageUrl: widget.imageUrl,
-                    title: widget.title,
-                    description: widget.description,
-                    timestamp: widget.timestamp,
-                    userEmail: widget.userEmail,
-                    latitude: widget.latitude,
-                    longitude: widget.longitude,
-                  ),
-                ),
+                MaterialPageRoute(builder: (context) => NotificationScreen()),
               );
             },
-          ),
+          )
         ],
       ),
       body: SingleChildScrollView(
@@ -94,11 +127,31 @@ class _DetailScreenState extends State<DetailScreen> {
                 children: [
                   Row(
                     children: [
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundImage: NetworkImage(
-                          'https://via.placeholder.com/150',
-                        ),
+                      FutureBuilder(
+                        future: _getProfilePicture(widget.userEmail),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            if (snapshot.hasData) {
+                              String profilePictureUrl =
+                                  snapshot.data as String;
+                              return CircleAvatar(
+                                radius: 20,
+                                backgroundImage:
+                                    NetworkImage(profilePictureUrl),
+                              );
+                            } else {
+                              return CircleAvatar(
+                                radius: 20,
+                                backgroundImage: NetworkImage(
+                                  'https://via.placeholder.com/150',
+                                ),
+                              );
+                            }
+                          } else {
+                            return CircularProgressIndicator(); // Show a loading indicator while the future is loading
+                          }
+                        },
                       ),
                       SizedBox(width: 8.0),
                       Text(
@@ -142,6 +195,29 @@ class _DetailScreenState extends State<DetailScreen> {
                           ),
                         ],
                       ),
+                      FirebaseAuth.instance.currentUser?.email ==
+                              widget.userEmail
+                          ? IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => EditPostScreen(
+                                      documentId: widget.documentId,
+                                      imageUrl: widget.imageUrl,
+                                      title: widget.title,
+                                      description: widget.description,
+                                      timestamp: widget.timestamp,
+                                      userEmail: widget.userEmail,
+                                      latitude: widget.latitude,
+                                      longitude: widget.longitude,
+                                    ),
+                                  ),
+                                );
+                              },
+                            )
+                          : Container(), // Don't show the edit button if it's not the current user's post
                     ],
                   ),
                   SizedBox(height: 8.0),
@@ -229,6 +305,17 @@ class _DetailScreenState extends State<DetailScreen> {
     );
   }
 
+  Future<String> _getProfilePicture(String userEmail) async {
+    final collectionRef = FirebaseFirestore.instance.collection('profile');
+    final snapshot = await collectionRef.doc(userEmail).get();
+
+    if (snapshot.exists) {
+      return snapshot.get('profilePicture') ?? '';
+    } else {
+      return 'https://via.placeholder.com/150'; // Return a default profile picture URL if the user document doesn't exist
+    }
+  }
+
   void _openMaps(double latitude, double longitude) async {
     String mapsUrl =
         'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
@@ -306,6 +393,10 @@ class _DetailScreenState extends State<DetailScreen> {
                 controller: _commentController,
                 decoration: InputDecoration(
                   labelText: 'Enter your comment',
+                  labelStyle: TextStyle(
+                    color: Colors.blue, // change the hint text color to grey
+                    fontWeight: FontWeight.bold,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10), // border radius
                     borderSide: BorderSide(
@@ -324,6 +415,7 @@ class _DetailScreenState extends State<DetailScreen> {
                   filled: true, // fill the background with a color
                   fillColor: Colors.white,
                 ),
+                style: TextStyle(color: Colors.black),
               ),
               SizedBox(height: 16),
               ElevatedButton(
@@ -376,8 +468,18 @@ class _DetailScreenState extends State<DetailScreen> {
         print('User not authenticated');
       }
       Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Comment Posted'),
+        ),
+      );
     } else {
       print('Comment text is empty');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Comment text is empty'),
+        ),
+      );
     }
   }
 
