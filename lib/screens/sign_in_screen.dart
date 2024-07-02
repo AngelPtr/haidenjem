@@ -37,7 +37,7 @@ class SignInScreenState extends State<SignInScreen> {
         );
         await FirebaseAuth.instance.signInWithCredential(credential);
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) => BottomNavBar()),
         );
       }
     } catch (error) {

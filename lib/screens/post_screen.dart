@@ -79,6 +79,7 @@ class _PostScreenState extends State<PostScreen> {
                     color: Colors.blue, // change the hint text color to grey
                   ),
                 ),
+                style: TextStyle(color: Colors.black),
               ),
               SizedBox(height: 16),
               TextField(
@@ -95,6 +96,7 @@ class _PostScreenState extends State<PostScreen> {
                     color: Colors.blue, // change the hint text color to grey
                   ),
                 ),
+                style: TextStyle(color: Colors.black),
               ),
               SizedBox(height: 16),
               ElevatedButton(
@@ -154,7 +156,7 @@ class _PostScreenState extends State<PostScreen> {
                     );
 
                     Navigator.of(context).pushReplacement(MaterialPageRoute(
-                        builder: (context) => const HomeScreen()));
+                        builder: (context) => BottomNavBar()));
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -243,6 +245,21 @@ class _LocationWidgetState extends State<LocationWidget> {
   Position? _currentPosition;
 
   Future<void> _getCurrentLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      _showError('Location services are disabled.');
+      return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        _showError('Location permission denied');
+        return;
+      }
+    }
+
     try {
       final position = await Geolocator.getCurrentPosition(
         forceAndroidLocationManager: true,
@@ -256,23 +273,14 @@ class _LocationWidgetState extends State<LocationWidget> {
             position); // Callback to notify the parent about the location change
       });
     } catch (e) {
-      print('Error getting location: $e');
+      _showError('Error getting location: $e');
     }
-    bool serviceEnabled;
-    LocationPermission permission;
+  }
 
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      print('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        print('Location permissions are denied');
-      }
-    }
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   @override

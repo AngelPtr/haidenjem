@@ -97,7 +97,11 @@ class _BottomNavBarState extends State<BottomNavBar> {
           BottomNavigationBarItem(
             icon: Container(
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.white),
+                border: Border.all(
+                  color: _selectedIndex == 0
+                      ? Colors.lightGreenAccent
+                      : Colors.white,
+                ),
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               child: Icon(Icons.home),
@@ -107,7 +111,11 @@ class _BottomNavBarState extends State<BottomNavBar> {
           BottomNavigationBarItem(
             icon: Container(
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.white),
+                border: Border.all(
+                  color: _selectedIndex == 1
+                      ? Colors.lightGreenAccent
+                      : Colors.white,
+                ),
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               child: Icon(Icons.search),
@@ -119,7 +127,11 @@ class _BottomNavBarState extends State<BottomNavBar> {
               height: 50,
               width: 50,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.white),
+                border: Border.all(
+                  color: _selectedIndex == 2
+                      ? Colors.lightGreenAccent
+                      : Colors.white,
+                ),
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               child: Icon(Icons.add),
@@ -129,7 +141,11 @@ class _BottomNavBarState extends State<BottomNavBar> {
           BottomNavigationBarItem(
             icon: Container(
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.white),
+                border: Border.all(
+                  color: _selectedIndex == 3
+                      ? Colors.lightGreenAccent
+                      : Colors.white,
+                ),
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               child: Icon(Icons.favorite),
@@ -139,7 +155,11 @@ class _BottomNavBarState extends State<BottomNavBar> {
           BottomNavigationBarItem(
             icon: Container(
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.white),
+                border: Border.all(
+                  color: _selectedIndex == 4
+                      ? Colors.lightGreenAccent
+                      : Colors.white,
+                ),
                 borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               child: Icon(Icons.person),

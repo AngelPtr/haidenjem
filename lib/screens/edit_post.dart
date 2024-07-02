@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:haidenjem/main.dart';
 
 class EditPostScreen extends StatefulWidget {
   final String documentId;
@@ -92,6 +93,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
                     return null;
                   },
                   onSaved: (value) => _newTitle = value!,
+                  style: TextStyle(color: Colors.black),
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -116,6 +118,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
                     return null;
                   },
                   onSaved: (value) => _newDescription = value!,
+                  style: TextStyle(color: Colors.black),
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
@@ -139,7 +142,11 @@ class _EditPostScreenState extends State<EditPostScreen> {
                           'deskripsi': _newDescription,
                         });
 
-                        Navigator.pop(context);
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => BottomNavBar()),
+                        );
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text('Post Succesfully Updated'),
@@ -172,7 +179,15 @@ class _EditPostScreenState extends State<EditPostScreen> {
                           .doc(widget.documentId)
                           .delete();
 
-                      Navigator.pop(context);
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => BottomNavBar()),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Post Deleted'),
+                        ),
+                      );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(

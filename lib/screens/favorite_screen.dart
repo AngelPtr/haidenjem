@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:haidenjem/main.dart';
 import 'package:haidenjem/screens/detail_screen.dart';
 import 'package:haidenjem/screens/home_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class FavoriteScreen extends StatefulWidget {
   const FavoriteScreen({super.key});
@@ -13,7 +14,7 @@ class FavoriteScreen extends StatefulWidget {
 
 class _FavoriteScreenState extends State<FavoriteScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final String userId = 'current_user_id'; // Replace with the current user's ID
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +33,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
       body: StreamBuilder<QuerySnapshot>(
         stream: _firestore
             .collection('favorites')
-            .doc(userId)
+            .doc(_auth.currentUser!.email)
             .collection('posts')
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {

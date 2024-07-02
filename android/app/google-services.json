@@ -12,7 +12,20 @@
           "package_name": "com.example.haidenjem"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "231154984703-9uq0derhen49p238hbtn177r7umfj3um.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.haidenjem",
+            "certificate_hash": "3f155b1dd732ca9f09e6e0c12c7952a3c45ad883"
+          }
+        },
+        {
+          "client_id": "231154984703-6jm1g98dk79o0a6a3s5uoauapr19q63e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBlw3Rp9D4h6qx39CE0ogu9ExHkVj-76Uw"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "231154984703-6jm1g98dk79o0a6a3s5uoauapr19q63e.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "231154984703-4q79jovvii2u1dpjk8qsb8f6ltvbc7bg.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.haidenjem.RunnerTests"
+              }
+            }
+          ]
         }
       }
     }

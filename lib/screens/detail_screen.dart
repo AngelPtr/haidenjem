@@ -332,12 +332,11 @@ class _DetailScreenState extends State<DetailScreen> {
 
   void _likeData() async {
     final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-    final String userId =
-        'current_user_id'; // Replace with the current user's ID
+    final String userEmail = FirebaseAuth.instance.currentUser!.email!;
 
     final DocumentSnapshot favoriteDoc = await _firestore
         .collection('favorites')
-        .doc(userId)
+        .doc(userEmail)
         .collection('posts')
         .doc(widget.documentId)
         .get();
@@ -345,7 +344,7 @@ class _DetailScreenState extends State<DetailScreen> {
     if (favoriteDoc.exists) {
       await _firestore
           .collection('favorites')
-          .doc(userId)
+          .doc(userEmail)
           .collection('posts')
           .doc(widget.documentId)
           .delete();
@@ -358,7 +357,7 @@ class _DetailScreenState extends State<DetailScreen> {
     } else {
       await _firestore
           .collection('favorites')
-          .doc(userId)
+          .doc(userEmail)
           .collection('posts')
           .doc(widget.documentId)
           .set({
@@ -367,7 +366,7 @@ class _DetailScreenState extends State<DetailScreen> {
         'imageUrl': widget.imageUrl,
         'description': widget.description,
         'timestamp': widget.timestamp,
-        'userEmail': widget.userEmail,
+        'userEmail': userEmail,
         'latitude': widget.latitude,
         'longitude': widget.longitude,
       });
